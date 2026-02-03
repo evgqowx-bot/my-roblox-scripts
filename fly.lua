@@ -4,19 +4,35 @@ local hrp = char:WaitForChild("HumanoidRootPart")
 
 local sg = Instance.new("ScreenGui", game.CoreGui)
 local btn = Instance.new("TextButton", sg)
-btn.Size = UDim2.new(0, 120, 0, 40)
-btn.Position = UDim2.new(0.5, -60, 0.2, 0)
-btn.Text = "ПОДНЯТЬ"
-btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-btn.TextColor3 = Color3.new(1,1,1)
+btn.Size = UDim2.new(0, 150, 0, 50)
+btn.Position = UDim2.new(0.5, -75, 0.15, 0)
+btn.Text = "ВЗЛЕТ (SAFE)"
+btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.Font = Enum.Font.SourceSansBold
+btn.TextSize = 20
 btn.Draggable = true
 
-btn.MouseButton1Click:Connect(function()
-    hrp.CFrame = hrp.CFrame * CFrame.new(0, 15, 0) 
+local isFlying = false
+local speed = 1.5 
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if isFlying then
+      
+        hrp.CFrame = hrp.CFrame + Vector3.new(0, speed, 0)
+       
+        hrp.Velocity = Vector3.new(0, 0.1, 0) 
+    end
 end)
 
-game.StarterGui:SetCore("SendNotification", {
-	Title = "Режим прыжков";
-	Text = "Нажимай кнопку, чтобы подлетать";
-	Duration = 5;
-})
+
+btn.MouseButton1Click:Connect(function()
+    isFlying = not isFlying
+    if isFlying then
+        btn.Text = "СТОП"
+        btn.TextColor3 = Color3.fromRGB(255, 0, 0) 
+    else
+        btn.Text = "ВЗЛЕТ (SAFE)"
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end)
