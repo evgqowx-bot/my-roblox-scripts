@@ -11,7 +11,7 @@ btn.TextSize = 20
 btn.Draggable = true
 
 local isFlying = false
-local speed = 1.3 
+local speed = 0.8
 
 local function getHRP()
     local char = game.Players.LocalPlayer.Character
