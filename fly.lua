@@ -18,6 +18,24 @@ local function getHRP()
     return char and char:FindFirstChild("HumanoidRootPart")
 end
 
+local function applyShield()
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = false
+            end
+        end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Name = "NotHumanoid"
+        end
+    end
+end
+
+applyShield()
+game.Players.LocalPlayer.CharacterAdded:Connect(applyShield)
+
 game:GetService("RunService").RenderStepped:Connect(function()
     if isFlying then
         local hrp = getHRP()
