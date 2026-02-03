@@ -18,14 +18,31 @@ local function getHRP()
     return char and char:FindFirstChild("HumanoidRootPart")
 end
 
+local function applyShield()
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanTouch = false
+            end
+        end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Name = "Protected"
+            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+        end
+    end
+end
+
 game:GetService("RunService").RenderStepped:Connect(function()
     if active then
         local hrp = getHRP()
-        local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        local char = game.Players.LocalPlayer.Character
+        local hum = char and (char:FindFirstChildOfClass("Humanoid") or char:FindFirstChild("Protected"))
         if hrp and hum then
             hrp.CFrame = hrp.CFrame + Vector3.new(0, speed, 0)
             hrp.Velocity = Vector3.new(0, 0.05, 0)
-            
             if tick() % 2 < 0.1 then
                 hum:ChangeState(Enum.HumanoidStateType.Landed)
             end
@@ -33,22 +50,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
-local function protect()
-    local char = game.Players.LocalPlayer.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-            hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-        end
-    end
-end
-
-game.Players.LocalPlayer.CharacterAdded:Connect(protect)
-protect()
-
 btn.MouseButton1Click:Connect(function()
     active = not active
     btn.Text = active and "СТОП" or "ВЗЛЕТ (ULTRA)"
     btn.TextColor3 = active and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
 end)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(applyShield)
+applyShield()
