@@ -11,40 +11,36 @@ btn.TextSize = 20
 btn.Draggable = true
 
 local isFlying = false
-local speed = 0.8
+local speed = 0.6
 
 local function getHRP()
     local char = game.Players.LocalPlayer.Character
     return char and char:FindFirstChild("HumanoidRootPart")
 end
 
-local function applyShield()
-    local char = game.Players.LocalPlayer.Character
-    if char then
-        for _, v in pairs(char:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.CanTouch = false
-            end
-        end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.Name = "NotHumanoid"
-        end
-    end
-end
-
-applyShield()
-game.Players.LocalPlayer.CharacterAdded:Connect(applyShield)
-
 game:GetService("RunService").RenderStepped:Connect(function()
     if isFlying then
         local hrp = getHRP()
         if hrp then
-            hrp.CFrame = hrp.CFrame + Vector3.new(0, speed, 0)
-            hrp.Velocity = Vector3.new(0, 0, 0)
+            local jitter = (math.random(-5, 5) / 100)
+            hrp.CFrame = hrp.CFrame + Vector3.new(0, speed + jitter, 0)
+            hrp.Velocity = Vector3.new(hrp.Velocity.X, 0.05, hrp.Velocity.Z)
         end
     end
 end)
+
+local function protect()
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.HipHeight = 2.1
+        end
+    end
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(protect)
+protect()
 
 btn.MouseButton1Click:Connect(function()
     isFlying = not isFlying
