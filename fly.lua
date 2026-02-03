@@ -1,32 +1,31 @@
-local ScreenGui = Instance.new("ScreenGui")
-local Toggle = Instance.new("TextButton")
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
 
-ScreenGui.Parent = game.CoreGui
-Toggle.Name = "ToggleFly"
-Toggle.Parent = ScreenGui
-Toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Toggle.Position = UDim2.new(0.1, 0, 0.1, 0)
-Toggle.Size = UDim2.new(0, 100, 0, 50)
-Toggle.Text = "ВЗЛЕТ"
-Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+-- Создаем GUI
+local sg = Instance.new("ScreenGui", game.CoreGui)
+local btn = Instance.new("TextButton", sg)
+btn.Size = UDim2.new(0, 120, 0, 40)
+btn.Position = UDim2.new(0.5, -60, 0.2, 0)
+btn.Text = "ВЗЛЕТ (SAFE)"
+btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+btn.TextColor3 = Color3.new(1,1,1)
+btn.Draggable = true
 
-local flying = false
-local bv = Instance.new("BodyVelocity")
-bv.MaxForce = Vector3.new(0, math.huge, 0)
+local isFlying = false
+local speed = 1.5 -- Маленькая скорость, чтобы античит не спалил
 
-Toggle.MouseButton1Click:Connect(function()
-    flying = not flying
-    local char = game.Players.LocalPlayer.Character
-    local hrp = char:WaitForChild("HumanoidRootPart")
-    
-    if flying then
-        bv.Parent = hrp
-        bv.Velocity = Vector3.new(0, 35, 0) -- Скорость 35 меньше палится, чем 50
-        Toggle.Text = "СТОП"
-        Toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    else
-        bv.Parent = nil
-        Toggle.Text = "ВЗЛЕТ"
-        Toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+game:GetService("RunService").RenderStepped:Connect(function()
+    if isFlying then
+        -- Вместо силы (velocity) мы плавно меняем позицию
+        hrp.CFrame = hrp.CFrame + Vector3.new(0, speed, 0)
+        -- Обнуляем скорость падения, чтобы античит не думал, что мы падаем
+        hrp.Velocity = Vector3.new(0, 0.1, 0) 
     end
+end)
+
+btn.MouseButton1Click:Connect(function()
+    isFlying = not isFlying
+    btn.Text = isFlying and "СТОП" or "ВЗЛЕТ (SAFE)"
+    btn.BackgroundColor3 = isFlying and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(50, 50, 50)
 end)
